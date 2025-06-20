@@ -1,0 +1,471 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * No-Skills Chat - Système de couleurs personnalisé
+   * Utilise les valeurs HSL pour la compatibilité avec Tailwind CSS
+   */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Variables personnalisées pour No-Skills Chat */
+    --chat-primary: 221.2 83.2% 53.3%;
+    --chat-secondary: 220 14.3% 95.9%;
+    --chat-success: 142.1 76.2% 36.3%;
+    --chat-warning: 32.6 94.6% 43.7%;
+    --chat-danger: 0 84.2% 60.2%;
+    --chat-online: 142.1 76.2% 36.3%;
+    --chat-offline: 215.4 16.3% 46.9%;
+    --chat-typing: 262.1 83.3% 57.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 217.2 91.2% 59.8%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Variables sombres pour No-Skills Chat */
+    --chat-primary: 217.2 91.2% 59.8%;
+    --chat-secondary: 217.2 32.6% 17.5%;
+    --chat-success: 142.1 70.6% 45.3%;
+    --chat-warning: 47.9 95.8% 53.1%;
+    --chat-danger: 0 72.2% 50.6%;
+    --chat-online: 142.1 70.6% 45.3%;
+    --chat-offline: 215 20.2% 65.1%;
+    --chat-typing: 262.1 83.3% 67.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  /* Scrollbar personnalisée pour No-Skills Chat */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 dark:bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-400 dark:bg-gray-500;
+  }
+
+  /* Animations personnalisées */
+  @keyframes typing {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes blob {
+    0% {
+      transform: translate(0px, 0px) scale(1);
+    }
+    33% {
+      transform: translate(30px, -50px) scale(1.1);
+    }
+    66% {
+      transform: translate(-20px, 20px) scale(0.9);
+    }
+    100% {
+      transform: translate(0px, 0px) scale(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-typing {
+    animation: typing 1.5s ease-in-out infinite;
+  }
+
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Styles pour les sélections */
+  ::selection {
+    @apply bg-blue-200 text-blue-900;
+  }
+
+  ::-moz-selection {
+    @apply bg-blue-200 text-blue-900;
+  }
+}
+
+@layer components {
+  /* Styles pour les messages de chat No-Skills */
+  .message-bubble {
+    @apply max-w-xs lg:max-w-md xl:max-w-lg break-words;
+  }
+
+  .message-own {
+    @apply bg-blue-500 text-white rounded-lg px-4 py-2 shadow-message;
+  }
+
+  .message-other {
+    @apply bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg px-4 py-2 shadow-message;
+  }
+
+  .message-system {
+    @apply bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-lg px-3 py-1 text-sm italic;
+  }
+
+  /* Styles pour l'indicateur en ligne */
+  .status-online {
+    @apply relative after:absolute after:-bottom-1 after:-right-1 after:h-4 after:w-4 after:rounded-full after:bg-green-500 after:ring-2 after:ring-white after:dark:ring-gray-800;
+  }
+
+  .status-offline {
+    @apply relative after:absolute after:-bottom-1 after:-right-1 after:h-4 after:w-4 after:rounded-full after:bg-gray-400 after:ring-2 after:ring-white after:dark:ring-gray-800;
+  }
+
+  /* Styles pour les thèmes de chat */
+  .chat-theme-default {
+    @apply bg-white text-gray-900;
+  }
+
+  .chat-theme-dark {
+    @apply bg-gray-900 text-white;
+  }
+
+  .chat-theme-blue {
+    @apply bg-blue-50 text-blue-900;
+  }
+
+  .chat-theme-green {
+    @apply bg-green-50 text-green-900;
+  }
+
+  .chat-theme-purple {
+    @apply bg-purple-50 text-purple-900;
+  }
+
+  /* Styles pour les badges de rôle */
+  .role-admin {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  }
+
+  .role-moderator {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+  }
+
+  .role-user {
+    @apply bg-gray-100 text-gray-800 border-gray-200;
+  }
+
+  /* Styles pour les notifications */
+  .notification-success {
+    @apply bg-green-50 text-green-800 border-green-200;
+  }
+
+  .notification-error {
+    @apply bg-red-50 text-red-800 border-red-200;
+  }
+
+  .notification-warning {
+    @apply bg-yellow-50 text-yellow-800 border-yellow-200;
+  }
+
+  .notification-info {
+    @apply bg-blue-50 text-blue-800 border-blue-200;
+  }
+
+  /* Boutons personnalisés No-Skills */
+  .btn-no-skills {
+    @apply bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl;
+  }
+
+  .btn-no-skills-outline {
+    @apply border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white font-semibold rounded-lg transition-all duration-200;
+  }
+
+  /* Cards personnalisées */
+  .card-no-skills {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-floating rounded-xl;
+  }
+
+  .card-no-skills-solid {
+    @apply bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-chat rounded-xl;
+  }
+
+  /* Zone de chat */
+  .chat-container {
+    @apply flex flex-col h-screen bg-gray-100 dark:bg-gray-900;
+  }
+
+  .chat-header {
+    @apply bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 shadow-sm;
+  }
+
+  .chat-messages {
+    @apply flex-1 overflow-y-auto p-4 space-y-4;
+  }
+
+  .chat-input-container {
+    @apply bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4;
+  }
+
+  /* Sidebar */
+  .sidebar-no-skills {
+    @apply w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col;
+  }
+
+  /* Gradients personnalisés */
+  .gradient-no-skills {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .gradient-no-skills-purple {
+    background: linear-gradient(135deg, #a855f7 0%, #3b82f6 100%);
+  }
+
+  .gradient-no-skills-blue {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  }
+}
+
+@layer utilities {
+  /* Utilitaires personnalisés pour No-Skills Chat */
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-md {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .text-shadow-lg {
+    text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .backdrop-blur-xs {
+    backdrop-filter: blur(2px);
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Utilitaires pour les espacements */
+  .space-y-safe {
+    > * + * {
+      margin-top: 0.5rem;
+    }
+  }
+
+  /* Transitions personnalisées */
+  .transition-no-skills {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .transition-fast {
+    transition: all 0.15s ease-out;
+  }
+
+  .transition-slow {
+    transition: all 0.5s ease-in-out;
+  }
+
+  /* Effets de survol */
+  .hover-lift {
+    transition: transform 0.2s ease-out;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+  }
+
+  .hover-scale {
+    transition: transform 0.2s ease-out;
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.05);
+  }
+
+  /* Focus personnalisé */
+  .focus-no-skills {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  /* Classes de debugging (à supprimer en production) */
+  .debug-border {
+    @apply border-2 border-red-500;
+  }
+
+  .debug-bg {
+    @apply bg-red-100;
+  }
+}
+
+/* Media queries personnalisées */
+@media (max-width: 640px) {
+  .mobile-chat-container {
+    @apply h-screen overflow-hidden;
+  }
+
+  .mobile-sidebar {
+    @apply fixed inset-y-0 left-0 z-50 w-full transform transition-transform duration-300 ease-in-out;
+  }
+
+  .mobile-sidebar.closed {
+    @apply -translate-x-full;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-typing,
+  .animate-fade-in,
+  .animate-slide-up {
+    animation: none;
+  }
+
+  .transition-no-skills,
+  .transition-fast,
+  .transition-slow {
+    transition: none;
+  }
+}
+
+/* Styles pour l'impression */
+@media print {
+  .no-print {
+    @apply hidden;
+  }
+
+  .chat-container {
+    @apply h-auto;
+  }
+
+  .chat-messages {
+    @apply overflow-visible;
+  }
+}
