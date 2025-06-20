@@ -120,7 +120,7 @@ export default function TermsOfService() {
                     <p className="text-gray-700">
                       La plateforme est destinée exclusivement à la
                       communication légale et respectueuse entre utilisateurs
-                      majeurs.
+                      un minimua mature.
                     </p>
 
                     <h4 className="font-semibold text-gray-800 mt-4">

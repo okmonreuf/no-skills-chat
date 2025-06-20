@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "no-skills-chat",
-      script: "./server/server.js",
+      script: "./server/server-simple.js",
       instances: "max",
       exec_mode: "cluster",
       env: {

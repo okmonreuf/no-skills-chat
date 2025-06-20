@@ -109,18 +109,38 @@ const createDefaultAdmin = async () => {
   console.log(`✅ Admin par défaut créé: ${defaultAdmin.username}`);
 };
 
-// Routes API (imports dynamiques)
-const { default: authRoutes } = await import("./routes/auth.js");
-const { default: usersRoutes } = await import("./routes/users.js");
-const { default: chatsRoutes } = await import("./routes/chats.js");
-const { default: adminRoutes } = await import("./routes/admin.js");
-const { default: searchRoutes } = await import("./routes/search.js");
+// Routes API (imports dynamiques avec gestion d'erreur)
+try {
+  const { default: authRoutes } = await import("./routes/auth.js");
+  const { default: usersRoutes } = await import("./routes/users.js");
 
-app.use("/api/auth", authRoutes);
-app.use("/api/users", usersRoutes);
-app.use("/api/chats", chatsRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/search", searchRoutes);
+  app.use("/api/auth", authRoutes);
+  app.use("/api/users", usersRoutes);
+
+  // Chargement conditionnel des autres routes
+  try {
+    const { default: chatsRoutes } = await import("./routes/chats.js");
+    app.use("/api/chats", chatsRoutes);
+  } catch (e) {
+    console.log("⚠️ Routes chats non disponibles:", e.message);
+  }
+
+  try {
+    const { default: adminRoutes } = await import("./routes/admin.js");
+    app.use("/api/admin", adminRoutes);
+  } catch (e) {
+    console.log("⚠️ Routes admin non disponibles:", e.message);
+  }
+
+  try {
+    const { default: searchRoutes } = await import("./routes/search.js");
+    app.use("/api/search", searchRoutes);
+  } catch (e) {
+    console.log("⚠️ Routes search non disponibles:", e.message);
+  }
+} catch (error) {
+  console.error("❌ Erreur lors du chargement des routes:", error);
+}
 
 // Servir les fichiers statiques
 if (NODE_ENV === "production") {
