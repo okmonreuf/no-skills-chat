@@ -1,78 +1,132 @@
 module.exports = {
   apps: [
     {
-      name: "no-skills-chat",
-      script: "./server/server-simple.js",
-      instances: "max",
-      exec_mode: "cluster",
+      name: "yupichat-frontend",
+      script: "npm",
+      args: "run preview",
+      cwd: "./",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "1G",
       env: {
-        NODE_ENV: "development",
+        NODE_ENV: "production",
+        PORT: 4173,
+        VITE_API_URL: "http://localhost:3001",
+      },
+      env_production: {
+        NODE_ENV: "production",
+        PORT: 4173,
+        VITE_API_URL: "http://localhost:3001",
+      },
+      error_file: "./logs/frontend-error.log",
+      out_file: "./logs/frontend-out.log",
+      log_file: "./logs/frontend-combined.log",
+      time: true,
+    },
+    {
+      name: "yupichat-backend",
+      script: "./server/dist/server.js",
+      cwd: "./server",
+      instances: 1,
+      autorestart: true,
+      watch: false,
+      max_memory_restart: "2G",
+      env: {
+        NODE_ENV: "production",
         PORT: 3001,
-        DB_HOST: "localhost",
-        DB_PORT: 5432,
-        DB_NAME: "no_skills_chat",
-        DB_USER: "postgres",
-        DB_PASSWORD: "password",
-        JWT_SECRET: "no-skills-super-secret-key-2025",
-        EMAIL_HOST: "smtp.gmail.com",
-        EMAIL_PORT: 587,
-        EMAIL_USER: "noreply@no-skills.fr",
-        EMAIL_PASS: "your-email-password",
-        UPLOAD_PATH: "./uploads",
-        MAX_FILE_SIZE: "10mb",
-        CORS_ORIGIN: "http://localhost:3000",
-        ADMIN_USERNAME: "Yupi",
-        ADMIN_PASSWORD: "1515Dh!dofly",
-        ADMIN_EMAIL: "admin@no-skills.fr",
+        CLIENT_URL: "http://localhost:4173",
+        JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
+        MONGODB_URI: "mongodb://localhost:27017/yupichat",
+
+        // Configuration SMTP (à configurer selon votre service)
+        SMTP_HOST: "smtp.gmail.com",
+        SMTP_PORT: 587,
+        SMTP_SECURE: false,
+        SMTP_USER: "your-email@gmail.com",
+        SMTP_PASS: "your-app-password",
+        SMTP_FROM: "YupiChat <noreply@yupichat.com>",
+
+        // Configuration upload
+        UPLOAD_PATH: "/var/www/yupichat/uploads",
+        MAX_FILE_SIZE: "10485760", // 10MB en bytes
+
+        // Configuration logs
+        LOG_LEVEL: "info",
       },
       env_production: {
         NODE_ENV: "production",
         PORT: 3001,
-        DB_HOST: "localhost",
-        DB_PORT: 5432,
-        DB_NAME: "no_skills_chat_prod",
-        DB_USER: "postgres",
-        DB_PASSWORD: "production-password",
-        JWT_SECRET: "production-super-secret-key-2025-very-long-and-secure",
-        EMAIL_HOST: "smtp.no-skills.fr",
-        EMAIL_PORT: 587,
-        EMAIL_USER: "noreply@no-skills.fr",
-        EMAIL_PASS: "production-email-password",
-        UPLOAD_PATH: "/var/www/no-skills-chat/uploads",
-        MAX_FILE_SIZE: "10mb",
-        CORS_ORIGIN: "https://no-skills.fr",
-        ADMIN_USERNAME: "Yupi",
-        ADMIN_PASSWORD: "1515Dh!dofly",
-        ADMIN_EMAIL: "admin@no-skills.fr",
+        CLIENT_URL: "https://your-domain.com",
+        JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
+        MONGODB_URI: "mongodb://localhost:27017/yupichat",
+
+        // Configuration SMTP pour production
+        SMTP_HOST: "smtp.gmail.com",
+        SMTP_PORT: 587,
+        SMTP_SECURE: false,
+        SMTP_USER: "your-email@gmail.com",
+        SMTP_PASS: "your-app-password",
+        SMTP_FROM: "YupiChat <noreply@yupichat.com>",
+
+        // Configuration upload pour production
+        UPLOAD_PATH: "/var/www/yupichat/uploads",
+        MAX_FILE_SIZE: "10485760",
+
+        // Configuration logs pour production
+        LOG_LEVEL: "warn",
       },
-      log_file: "./logs/app.log",
-      error_file: "./logs/error.log",
-      out_file: "./logs/out.log",
-      log_date_format: "YYYY-MM-DD HH:mm:ss Z",
-      merge_logs: true,
-      max_memory_restart: "500M",
-      node_args: "--max-old-space-size=1024",
-      watch: false,
-      ignore_watch: ["node_modules", "logs", "uploads"],
+      error_file: "./logs/backend-error.log",
+      out_file: "./logs/backend-out.log",
+      log_file: "./logs/backend-combined.log",
+      time: true,
+
+      // Configuration de monitoring
+      monitoring: false,
+      pmx: false,
+
+      // Configuration de restart
       max_restarts: 10,
-      min_uptime: "10s",
-      kill_timeout: 5000,
-      restart_delay: 4000,
-      autorestart: true,
-      // Configuration pour Termius et déploiement
-      deploy: {
-        production: {
-          user: "no-skills",
-          host: "no-skills.fr",
-          ref: "origin/main",
-          repo: "git@github.com:your-username/no-skills-chat.git",
-          path: "/var/www/no-skills-chat",
-          "pre-deploy-local": "",
-          "post-deploy":
-            "npm install && npm run build && pm2 reload ecosystem.config.cjs --env production",
-          "pre-setup": "",
-        },
-      },
+      min_uptime: "60s",
+
+      // Configuration de cluster si nécessaire
+      // instances: "max", // Décommentez pour utiliser tous les CPU
+      // exec_mode: "cluster",
     },
   ],
+
+  // Configuration de déploiement (optionnel)
+  deploy: {
+    production: {
+      user: "root",
+      host: "your-server-ip",
+      ref: "origin/main",
+      repo: "https://github.com/your-username/yupichat.git",
+      path: "/var/www/yupichat",
+
+      // Scripts de déploiement
+      "pre-deploy-local": "",
+      "post-deploy":
+        "npm install && npm run build && cd server && npm install && npm run build && pm2 reload ecosystem.config.cjs --env production",
+      "pre-setup": "apt update && apt install nodejs npm mongodb -y",
+
+      // Variables d'environnement pour le déploiement
+      env: {
+        NODE_ENV: "production",
+      },
+    },
+
+    staging: {
+      user: "root",
+      host: "staging-server-ip",
+      ref: "origin/develop",
+      repo: "https://github.com/your-username/yupichat.git",
+      path: "/var/www/yupichat-staging",
+      "post-deploy":
+        "npm install && npm run build && cd server && npm install && npm run build && pm2 reload ecosystem.config.cjs --env staging",
+      env: {
+        NODE_ENV: "staging",
+      },
+    },
+  },
 };

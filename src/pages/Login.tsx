@@ -1,381 +1,284 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuthStore } from "../stores/authStore";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, MessageCircle, Shield, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-} from "../components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../components/ui/tabs";
-import { Alert, AlertDescription } from "../components/ui/alert";
-import { MessageCircle, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
-import { cn } from "../lib/utils";
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login, register, isAuthenticated, isLoading } = useAuthStore();
+  const { login, isLoading, error, clearError, user } = useAuth();
 
-  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [registerForm, setRegisterForm] = useState({
+  const [formData, setFormData] = useState({
     username: "",
-    email: "",
     password: "",
-    confirmPassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState("login");
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (user) {
       navigate("/chat");
     }
-  }, [isAuthenticated, navigate]);
+  }, [user, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  useEffect(() => {
+    clearError();
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    clearError();
 
-    if (!loginForm.email || !loginForm.password) {
-      setError("Veuillez remplir tous les champs");
-      return;
-    }
-
-    const success = await login(loginForm.email, loginForm.password);
-    if (!success) {
-      setError("Email ou mot de passe incorrect");
+    try {
+      await login(formData);
+    } catch (error) {
+      // L'erreur est déjà gérée par le hook
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-
-    if (
-      !registerForm.username ||
-      !registerForm.email ||
-      !registerForm.password
-    ) {
-      setError("Veuillez remplir tous les champs");
-      return;
-    }
-
-    if (registerForm.password !== registerForm.confirmPassword) {
-      setError("Les mots de passe ne correspondent pas");
-      return;
-    }
-
-    if (registerForm.password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caractères");
-      return;
-    }
-
-    const success = await register(
-      registerForm.username,
-      registerForm.email,
-      registerForm.password,
-    );
-    if (!success) {
-      setError("Erreur lors de l'inscription");
-    }
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-800 flex items-center justify-center p-4">
-      {/* Particules d'arrière-plan */}
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
+      {/* Particules animées en arrière-plan */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-4 -left-4 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-        <div className="absolute -top-4 -right-4 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        {[...Array(20)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-primary/20 rounded-full"
+            animate={{
+              x: [0, 100, 0],
+              y: [0, -100, 0],
+              opacity: [0, 1, 0],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 10,
+              repeat: Infinity,
+              ease: "linear",
+            }}
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
       </div>
 
-      <div className="relative w-full max-w-md">
-        {/* Logo et titre */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="bg-white/10 backdrop-blur-sm rounded-full p-3">
-              <MessageCircle className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-bold text-white">No-Skills Chat</h1>
-          <p className="text-blue-100 mt-2">Messagerie sécurisée et moderne</p>
-        </div>
-
-        <Card className="bg-white/10 backdrop-blur-md border-white/20 shadow-2xl">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-white">
-              Bienvenue
-            </CardTitle>
-            <CardDescription className="text-blue-100 text-center">
-              Connectez-vous ou créez un compte
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
+      <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center relative z-10">
+        {/* Section gauche - Présentation */}
+        <motion.div
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="hidden lg:block space-y-8"
+        >
+          <div className="space-y-4">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring" }}
+              className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center"
             >
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/10">
-                <TabsTrigger
-                  value="login"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-blue-600"
-                >
-                  Connexion
-                </TabsTrigger>
-                <TabsTrigger
-                  value="register"
-                  className="text-white data-[state=active]:bg-white data-[state=active]:text-blue-600"
-                >
-                  Inscription
-                </TabsTrigger>
-              </TabsList>
+              <MessageCircle className="w-8 h-8 text-primary-foreground" />
+            </motion.div>
 
-              {error && (
-                <Alert className="mb-4 bg-red-500/10 border-red-500/20 text-red-100">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+            <h1 className="text-4xl lg:text-5xl font-bold gradient-text">
+              YupiChat
+            </h1>
 
-              <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white">
-                      Email
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="votre@email.com"
-                        value={loginForm.email}
-                        onChange={(e) =>
-                          setLoginForm({ ...loginForm, email: e.target.value })
-                        }
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
+            <p className="text-xl text-muted-foreground">
+              La plateforme de messagerie moderne et sécurisée pour votre
+              communauté
+            </p>
+          </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="password" className="text-white">
-                      Mot de passe
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={loginForm.password}
-                        onChange={(e) =>
-                          setLoginForm({
-                            ...loginForm,
-                            password: e.target.value,
-                          })
-                        }
-                        className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-blue-200 hover:text-white"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="flex items-center space-x-4"
+            >
+              <div className="w-12 h-12 bg-chat-primary/10 rounded-xl flex items-center justify-center">
+                <Shield className="w-6 h-6 text-chat-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Sécurité Avancée</h3>
+                <p className="text-sm text-muted-foreground">
+                  Chiffrement de bout en bout et modération intelligente
+                </p>
+              </div>
+            </motion.div>
 
-                  <Button
-                    type="submit"
-                    className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold"
-                    disabled={isLoading}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="flex items-center space-x-4"
+            >
+              <div className="w-12 h-12 bg-chat-accent/10 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-chat-accent" />
+              </div>
+              <div>
+                <h3 className="font-semibold">
+                  Système de Communication Avancé
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Technologie de pointe pour des échanges sécurisés
+                </p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="flex items-center space-x-4"
+            >
+              <div className="w-12 h-12 bg-admin-success/10 rounded-xl flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-admin-success" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Temps Réel</h3>
+                <p className="text-sm text-muted-foreground">
+                  Messages instantanés avec indicateurs de lecture
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Section droite - Formulaire */}
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6 }}
+          className="w-full"
+        >
+          <Card className="glass-effect border-border/50 shadow-2xl">
+            <CardHeader className="space-y-2">
+              <div className="lg:hidden flex items-center space-x-2 mb-4">
+                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <h1 className="text-2xl font-bold gradient-text">YupiChat</h1>
+              </div>
+
+              <CardTitle className="text-2xl font-bold">Connexion</CardTitle>
+              <CardDescription>
+                Connectez-vous à votre compte pour accéder au chat
+              </CardDescription>
+            </CardHeader>
+
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-6">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="w-full"
                   >
-                    {isLoading ? "Connexion..." : "Se connecter"}
-                  </Button>
-                </form>
-              </TabsContent>
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  </motion.div>
+                )}
 
-              <TabsContent value="register">
-                <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="username" className="text-white">
-                      Nom d'utilisateur
-                    </Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="username"
-                        type="text"
-                        placeholder="VotreNom"
-                        value={registerForm.username}
-                        onChange={(e) =>
-                          setRegisterForm({
-                            ...registerForm,
-                            username: e.target.value,
-                          })
-                        }
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                    </div>
+                <div className="space-y-2">
+                  <Label htmlFor="username">Nom d'utilisateur</Label>
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Entrez votre nom d'utilisateur"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    required
+                    className="h-12 bg-background/50"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mot de passe</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Entrez votre mot de passe"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      required
+                      className="h-12 bg-background/50 pr-12"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </Button>
                   </div>
+                </div>
+              </CardContent>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-email" className="text-white">
-                      Email
-                    </Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="reg-email"
-                        type="email"
-                        placeholder="votre@email.com"
-                        value={registerForm.email}
-                        onChange={(e) =>
-                          setRegisterForm({
-                            ...registerForm,
-                            email: e.target.value,
-                          })
-                        }
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="reg-password" className="text-white">
-                      Mot de passe
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="reg-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={registerForm.password}
-                        onChange={(e) =>
-                          setRegisterForm({
-                            ...registerForm,
-                            password: e.target.value,
-                          })
-                        }
-                        className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-blue-200 hover:text-white"
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-white">
-                      Confirmer le mot de passe
-                    </Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-blue-200" />
-                      <Input
-                        id="confirm-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={registerForm.confirmPassword}
-                        onChange={(e) =>
-                          setRegisterForm({
-                            ...registerForm,
-                            confirmPassword: e.target.value,
-                          })
-                        }
-                        className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-blue-200"
-                        disabled={isLoading}
-                      />
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Inscription..." : "Créer un compte"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-
-            <div className="mt-6 text-center">
-              <p className="text-blue-100 text-sm">
-                En vous connectant, vous acceptez nos{" "}
-                <Link
-                  to="/terms"
-                  className="text-white underline hover:text-blue-200 transition-colors"
+              <CardFooter className="flex flex-col space-y-4">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-12 text-base font-semibold"
                 >
-                  &nbsp;conditions d'utilisation
-                </Link>
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+                  {isLoading ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                    />
+                  ) : (
+                    "Se connecter"
+                  )}
+                </Button>
 
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-blue-100 text-sm">
-            © 2025 No-Skills.fr - Messagerie sécurisée
-          </p>
-        </div>
+                <div className="text-center text-sm">
+                  <span className="text-muted-foreground">
+                    Pas encore de compte ?{" "}
+                  </span>
+                  <Link
+                    to="/register"
+                    className="text-primary hover:text-primary/80 font-semibold transition-colors"
+                  >
+                    Créer un compte
+                  </Link>
+                </div>
+              </CardFooter>
+            </form>
+          </Card>
+        </motion.div>
       </div>
-
-      <style jsx>{`
-        @keyframes blob {
-          0% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          33% {
-            transform: translate(30px, -50px) scale(1.1);
-          }
-          66% {
-            transform: translate(-20px, 20px) scale(0.9);
-          }
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-        }
-        .animate-blob {
-          animation: blob 7s infinite;
-        }
-        .animation-delay-2000 {
-          animation-delay: 2s;
-        }
-        .animation-delay-4000 {
-          animation-delay: 4s;
-        }
-      `}</style>
     </div>
   );
 }
