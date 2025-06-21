@@ -37,7 +37,8 @@ module.exports = {
         PORT: 3001,
         CLIENT_URL: "http://localhost:4173",
         JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
-        MONGODB_URI: "mongodb://localhost:27017/yupichat",
+        MONGODB_URI:
+          "mongodb://yupichat_user:YupiChatPassword123!@localhost:27017/yupichat",
 
         // Configuration SMTP (à configurer selon votre service)
         SMTP_HOST: "smtp.gmail.com",
@@ -59,7 +60,8 @@ module.exports = {
         PORT: 3001,
         CLIENT_URL: "https://your-domain.com",
         JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
-        MONGODB_URI: "mongodb://localhost:27017/yupichat",
+        MONGODB_URI:
+          "mongodb://yupichat_user:YupiChatPassword123!@localhost:27017/yupichat",
 
         // Configuration SMTP pour production
         SMTP_HOST: "smtp.gmail.com",

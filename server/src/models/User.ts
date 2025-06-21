@@ -140,9 +140,7 @@ const userSchema = new Schema<IUser>(
   },
 );
 
-// Index pour les recherches
-userSchema.index({ username: 1 });
-userSchema.index({ email: 1 });
+// Index pour les recherches (username et email sont déjà indexés via unique: true)
 userSchema.index({ role: 1 });
 userSchema.index({ isBanned: 1 });
 userSchema.index({ isVerified: 1 });
