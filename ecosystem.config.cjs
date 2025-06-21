@@ -11,13 +11,13 @@ module.exports = {
       max_memory_restart: "1G",
       env: {
         NODE_ENV: "production",
-        PORT: 4173,
-        VITE_API_URL: "http://localhost:3001",
+        PORT: 80,
+        VITE_API_URL: "https://no-skills.fr/api",
       },
       env_production: {
         NODE_ENV: "production",
-        PORT: 4173,
-        VITE_API_URL: "http://localhost:3001",
+        PORT: 80,
+        VITE_API_URL: "https://no-skills.fr/api",
       },
       error_file: "./logs/frontend-error.log",
       out_file: "./logs/frontend-out.log",
@@ -34,8 +34,8 @@ module.exports = {
       max_memory_restart: "2G",
       env: {
         NODE_ENV: "production",
-        PORT: 3001,
-        CLIENT_URL: "http://localhost:4173",
+        PORT: 3002,
+        CLIENT_URL: "https://no-skills.fr",
         JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
         MONGODB_URI:
           "mongodb://yupichat_user:YupiChatPassword123!@localhost:27017/yupichat",
@@ -57,8 +57,8 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: "production",
-        PORT: 3001,
-        CLIENT_URL: "https://your-domain.com",
+        PORT: 3002,
+        CLIENT_URL: "https://no-skills.fr",
         JWT_SECRET: "your-super-secret-jwt-key-change-in-production",
         MONGODB_URI:
           "mongodb://yupichat_user:YupiChatPassword123!@localhost:27017/yupichat",

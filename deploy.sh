@@ -297,11 +297,22 @@ deploy_production() {
     sudo mkdir -p /var/www/yupichat
     sudo mkdir -p /var/www/yupichat/uploads
     sudo mkdir -p /var/log/yupichat
+    sudo mkdir -p /etc/nginx/sites-available
+    sudo mkdir -p /etc/nginx/sites-enabled
 
     # Copier les fichiers
     sudo cp -r dist/* /var/www/yupichat/
     sudo cp -r $BACKEND_DIR/dist /var/www/yupichat/server
     sudo cp ecosystem.config.cjs /var/www/yupichat/
+
+    # Copier la configuration Nginx
+    sudo cp nginx-no-skills.conf /etc/nginx/sites-available/no-skills.fr
+
+    # Activer le site Nginx (si nginx est installé)
+    if command -v nginx &> /dev/null; then
+        sudo ln -sf /etc/nginx/sites-available/no-skills.fr /etc/nginx/sites-enabled/
+        sudo nginx -t && sudo systemctl reload nginx || print_warning "Nginx non configuré"
+    fi
 
     # Configurer les permissions
     sudo chown -R www-data:www-data /var/www/yupichat
@@ -434,10 +445,12 @@ main() {
     case $ENVIRONMENT in
         production)
             print_status "Application déployée en production"
-            print_status "Logs: pm2 logs yupichat-backend"
-            print_status "Status: pm2 status"
-            print_status "Restart: pm2 restart ecosystem.config.cjs"
-            print_status "MongoDB: docker logs yupichat-mongodb"
+            print_status "🌐 Site web: https://no-skills.fr"
+            print_status "⚙️  API: https://no-skills.fr/api/health"
+            print_status "📊 Logs: pm2 logs yupichat-backend"
+            print_status "📈 Status: pm2 status"
+            print_status "🔄 Restart: pm2 restart ecosystem.config.cjs"
+            print_status "🗄️  MongoDB: docker logs yupichat-mongodb"
             ;;
         staging)
             print_status "Application déployée en staging"
