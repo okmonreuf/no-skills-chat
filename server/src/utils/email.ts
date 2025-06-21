@@ -5,7 +5,7 @@ import { logger, loggerUtils } from "./logger";
 const createTransporter = () => {
   // En développement, utiliser un service de test comme Ethereal
   if (process.env.NODE_ENV === "development") {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: "smtp.ethereal.email",
       port: 587,
       auth: {
@@ -16,7 +16,7 @@ const createTransporter = () => {
   }
 
   // En production, utiliser un vrai service SMTP
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST || "smtp.gmail.com",
     port: parseInt(process.env.SMTP_PORT || "587"),
     secure: process.env.SMTP_SECURE === "true", // true pour 465, false pour d'autres ports
@@ -42,24 +42,24 @@ const emailTemplates = {
           <h1 style="color: white; margin: 0; font-size: 28px;">YupiChat</h1>
           <p style="color: white; margin: 10px 0 0 0; opacity: 0.9;">Système de messagerie moderne</p>
         </div>
-        
+
         <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 20px;">
           <h2 style="color: #333; margin-top: 0;">Bonjour ${username} !</h2>
           <p style="color: #666; line-height: 1.6;">
             Bienvenue sur YupiChat ! Pour activer votre compte, veuillez utiliser le code de vérification ci-dessous :
           </p>
-          
+
           <div style="background: white; border: 2px solid #667eea; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: center;">
             <div style="font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 5px; font-family: monospace;">
               ${code}
             </div>
           </div>
-          
+
           <p style="color: #666; line-height: 1.6;">
             Ce code est valide pendant 15 minutes. Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
           </p>
         </div>
-        
+
         <div style="text-align: center; color: #999; font-size: 14px;">
           <p>© 2024 YupiChat. Tous droits réservés.</p>
           <p>Cet email a été envoyé depuis une adresse automatique, merci de ne pas y répondre.</p>
@@ -68,15 +68,15 @@ const emailTemplates = {
     `,
     text: `
       Bonjour ${username} !
-      
+
       Bienvenue sur YupiChat ! Pour activer votre compte, veuillez utiliser le code de vérification suivant :
-      
+
       Code de vérification : ${code}
-      
+
       Ce code est valide pendant 15 minutes.
-      
+
       Si vous n'avez pas créé de compte, vous pouvez ignorer cet email.
-      
+
       © 2024 YupiChat. Tous droits réservés.
     `,
   }),
@@ -89,29 +89,29 @@ const emailTemplates = {
           <h1 style="color: white; margin: 0; font-size: 28px;">YupiChat</h1>
           <p style="color: white; margin: 10px 0 0 0; opacity: 0.9;">Réinitialisation de mot de passe</p>
         </div>
-        
+
         <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 20px;">
           <h2 style="color: #333; margin-top: 0;">Bonjour ${username} !</h2>
           <p style="color: #666; line-height: 1.6;">
             Vous avez demandé la réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe :
           </p>
-          
+
           <div style="text-align: center; margin: 30px 0;">
             <a href="${resetUrl}" style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
               Réinitialiser mon mot de passe
             </a>
           </div>
-          
+
           <p style="color: #666; line-height: 1.6; font-size: 14px;">
             Si le bouton ne fonctionne pas, vous pouvez copier et coller ce lien dans votre navigateur :<br>
             <a href="${resetUrl}" style="color: #667eea; word-break: break-all;">${resetUrl}</a>
           </p>
-          
+
           <p style="color: #666; line-height: 1.6;">
             Ce lien expire dans 1 heure. Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email.
           </p>
         </div>
-        
+
         <div style="text-align: center; color: #999; font-size: 14px;">
           <p>© 2024 YupiChat. Tous droits réservés.</p>
         </div>
@@ -119,16 +119,16 @@ const emailTemplates = {
     `,
     text: `
       Bonjour ${username} !
-      
+
       Vous avez demandé la réinitialisation de votre mot de passe.
-      
+
       Cliquez sur ce lien pour créer un nouveau mot de passe :
       ${resetUrl}
-      
+
       Ce lien expire dans 1 heure.
-      
+
       Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email.
-      
+
       © 2024 YupiChat. Tous droits réservés.
     `,
   }),
@@ -141,17 +141,17 @@ const emailTemplates = {
           <h1 style="color: white; margin: 0; font-size: 28px;">YupiChat</h1>
           <p style="color: white; margin: 10px 0 0 0; opacity: 0.9;">Notification de suspension</p>
         </div>
-        
+
         <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin-bottom: 20px;">
           <h2 style="color: #333; margin-top: 0;">Bonjour ${username},</h2>
           <p style="color: #666; line-height: 1.6;">
             Votre compte YupiChat a été suspendu pour la raison suivante :
           </p>
-          
+
           <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin: 20px 0;">
             <strong style="color: #856404;">Raison :</strong> ${reason}
           </div>
-          
+
           ${
             duration
               ? `<p style="color: #666; line-height: 1.6;">
@@ -161,12 +161,12 @@ const emailTemplates = {
                    <strong>Type :</strong> Suspension permanente
                  </p>`
           }
-          
+
           <p style="color: #666; line-height: 1.6;">
             Si vous pensez que cette suspension est injustifiée, vous pouvez contacter un administrateur.
           </p>
         </div>
-        
+
         <div style="text-align: center; color: #999; font-size: 14px;">
           <p>© 2024 YupiChat. Tous droits réservés.</p>
         </div>
@@ -174,14 +174,14 @@ const emailTemplates = {
     `,
     text: `
       Bonjour ${username},
-      
+
       Votre compte YupiChat a été suspendu.
-      
+
       Raison : ${reason}
       ${duration ? `Durée : ${duration}` : "Type : Suspension permanente"}
-      
+
       Si vous pensez que cette suspension est injustifiée, vous pouvez contacter un administrateur.
-      
+
       © 2024 YupiChat. Tous droits réservés.
     `,
   }),
@@ -195,9 +195,10 @@ export const sendEmail = async (
 ): Promise<boolean> => {
   try {
     const transporter = createTransporter();
-    const emailContent = emailTemplates[template](
-      ...(Array.isArray(data) ? data : [data]),
-    );
+    const emailTemplate = emailTemplates[template] as any;
+    const emailContent = Array.isArray(data)
+      ? emailTemplate(...data)
+      : emailTemplate(data);
 
     const mailOptions = {
       ...defaultOptions,

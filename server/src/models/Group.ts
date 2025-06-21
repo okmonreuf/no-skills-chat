@@ -186,7 +186,7 @@ groupSchema.methods.addMember = function (
 // Méthode pour supprimer un membre
 groupSchema.methods.removeMember = function (userId: mongoose.Types.ObjectId) {
   const memberIndex = this.members.findIndex(
-    (member) => member.userId.toString() === userId.toString(),
+    (member: IGroupMember) => member.userId.toString() === userId.toString(),
   );
 
   if (memberIndex === -1) {
@@ -202,7 +202,7 @@ groupSchema.methods.removeMember = function (userId: mongoose.Types.ObjectId) {
 
   // Retirer des admins si nécessaire
   const adminIndex = this.admins.findIndex(
-    (admin) => admin.toString() === userId.toString(),
+    (admin: mongoose.Types.ObjectId) => admin.toString() === userId.toString(),
   );
   if (adminIndex !== -1) {
     this.admins.splice(adminIndex, 1);
@@ -225,7 +225,7 @@ groupSchema.methods.promoteToAdmin = function (
 
   // Mettre à jour le rôle dans les membres
   const member = this.members.find(
-    (m) => m.userId.toString() === userId.toString(),
+    (m: IGroupMember) => m.userId.toString() === userId.toString(),
   );
   if (member) {
     member.role = "admin";
@@ -241,7 +241,7 @@ groupSchema.methods.demoteFromAdmin = function (
   }
 
   const adminIndex = this.admins.findIndex(
-    (admin) => admin.toString() === userId.toString(),
+    (admin: mongoose.Types.ObjectId) => admin.toString() === userId.toString(),
   );
 
   if (adminIndex === -1) {
@@ -252,7 +252,7 @@ groupSchema.methods.demoteFromAdmin = function (
 
   // Mettre à jour le rôle dans les membres
   const member = this.members.find(
-    (m) => m.userId.toString() === userId.toString(),
+    (m: IGroupMember) => m.userId.toString() === userId.toString(),
   );
   if (member) {
     member.role = "member";
@@ -264,7 +264,7 @@ groupSchema.methods.isMember = function (
   userId: mongoose.Types.ObjectId,
 ): boolean {
   return this.members.some(
-    (member) => member.userId.toString() === userId.toString(),
+    (member: IGroupMember) => member.userId.toString() === userId.toString(),
   );
 };
 
@@ -272,7 +272,9 @@ groupSchema.methods.isMember = function (
 groupSchema.methods.isAdmin = function (
   userId: mongoose.Types.ObjectId,
 ): boolean {
-  return this.admins.some((admin) => admin.toString() === userId.toString());
+  return this.admins.some(
+    (admin: mongoose.Types.ObjectId) => admin.toString() === userId.toString(),
+  );
 };
 
 // Méthode pour générer un code d'invitation

@@ -222,7 +222,7 @@ messageSchema.pre("save", function (next) {
     );
   }
 
-  // Définir isPrivate en fonction de la présence d'un destinataire
+  // D��finir isPrivate en fonction de la présence d'un destinataire
   this.isPrivate = !!this.recipientId;
 
   next();
@@ -247,7 +247,7 @@ messageSchema.methods.addReaction = function (
 ) {
   // Vérifier si l'utilisateur a déjà réagi avec cet emoji
   const existingReaction = this.reactions.find(
-    (reaction) =>
+    (reaction: IMessageReaction) =>
       reaction.emoji === emoji &&
       reaction.userId.toString() === userId.toString(),
   );
@@ -270,7 +270,7 @@ messageSchema.methods.removeReaction = function (
   userId: mongoose.Types.ObjectId,
 ) {
   const reactionIndex = this.reactions.findIndex(
-    (reaction) =>
+    (reaction: IMessageReaction) =>
       reaction.emoji === emoji &&
       reaction.userId.toString() === userId.toString(),
   );
@@ -286,7 +286,7 @@ messageSchema.methods.removeReaction = function (
 messageSchema.methods.markAsRead = function (userId: mongoose.Types.ObjectId) {
   // Vérifier si déjà lu par cet utilisateur
   const alreadyRead = this.readBy.some(
-    (read) => read.userId.toString() === userId.toString(),
+    (read: IMessageRead) => read.userId.toString() === userId.toString(),
   );
 
   if (!alreadyRead) {
@@ -302,7 +302,7 @@ messageSchema.methods.isReadBy = function (
   userId: mongoose.Types.ObjectId,
 ): boolean {
   return this.readBy.some(
-    (read) => read.userId.toString() === userId.toString(),
+    (read: IMessageRead) => read.userId.toString() === userId.toString(),
   );
 };
 

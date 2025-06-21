@@ -146,7 +146,7 @@ const startServer = async () => {
     process.on("SIGTERM", () => {
       logger.info("🛑 SIGTERM reçu, arrêt en cours...");
       server.close(() => {
-        mongoose.connection.close(false, () => {
+        mongoose.connection.close().then(() => {
           logger.info("✅ Serveur arrêté proprement");
           process.exit(0);
         });
