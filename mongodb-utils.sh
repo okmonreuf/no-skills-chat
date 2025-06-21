@@ -56,13 +56,27 @@ show_help() {
 # Démarrer MongoDB
 start_mongodb() {
     print_status "Démarrage de MongoDB..."
-    
+
+    # Exporter les variables d'environnement
+    export MONGO_PASSWORD="SecureYupiPassword123!"
+    export MONGO_EXPRESS_PASSWORD="AdminYupi123!"
+
+    # Déterminer la commande Docker Compose
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+    else
+        print_error "Docker Compose n'est pas disponible"
+        exit 1
+    fi
+
     if [ "$1" = "dev" ]; then
-        docker-compose --env-file .env.docker --profile development up -d
+        COMPOSE_PROFILES=development $DOCKER_COMPOSE_CMD up -d
         print_success "MongoDB et Mongo Express démarrés"
         print_status "Mongo Express disponible sur: http://localhost:8081"
     else
-        docker-compose --env-file .env.docker up -d mongodb
+        $DOCKER_COMPOSE_CMD up -d mongodb
         print_success "MongoDB démarré"
     fi
 }
@@ -70,14 +84,34 @@ start_mongodb() {
 # Arrêter MongoDB
 stop_mongodb() {
     print_status "Arrêt de MongoDB..."
-    docker-compose down
+
+    # Déterminer la commande Docker Compose
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker compose down
+    elif command -v docker-compose &> /dev/null; then
+        docker-compose down
+    else
+        print_error "Docker Compose n'est pas disponible"
+        exit 1
+    fi
+
     print_success "MongoDB arrêté"
 }
 
 # Redémarrer MongoDB
 restart_mongodb() {
     print_status "Redémarrage de MongoDB..."
-    docker-compose restart mongodb
+
+    # Déterminer la commande Docker Compose
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        docker compose restart mongodb
+    elif command -v docker-compose &> /dev/null; then
+        docker-compose restart mongodb
+    else
+        print_error "Docker Compose n'est pas disponible"
+        exit 1
+    fi
+
     print_success "MongoDB redémarré"
 }
 
@@ -85,7 +119,7 @@ restart_mongodb() {
 status_mongodb() {
     print_status "Statut de MongoDB:"
     docker ps --filter name=yupichat-mongodb --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-    
+
     # Test de connectivité
     if docker exec yupichat-mongodb mongosh --eval "db.adminCommand('ping')" &> /dev/null; then
         print_success "MongoDB est accessible"
@@ -111,13 +145,13 @@ shell_mongodb() {
 backup_mongodb() {
     BACKUP_DIR="./backups/mongodb/$(date +%Y%m%d_%H%M%S)"
     mkdir -p "$BACKUP_DIR"
-    
+
     print_status "Création de la sauvegarde dans $BACKUP_DIR..."
-    
+
     docker exec yupichat-mongodb mongodump --db yupichat --out /tmp/backup
     docker cp yupichat-mongodb:/tmp/backup/yupichat "$BACKUP_DIR/"
     docker exec yupichat-mongodb rm -rf /tmp/backup
-    
+
     print_success "Sauvegarde créée dans $BACKUP_DIR"
 }
 
@@ -128,25 +162,25 @@ restore_mongodb() {
         echo "Usage: $0 restore /path/to/backup/folder"
         exit 1
     fi
-    
+
     BACKUP_PATH="$1"
-    
+
     if [ ! -d "$BACKUP_PATH" ]; then
         print_error "Le dossier de sauvegarde n'existe pas: $BACKUP_PATH"
         exit 1
     fi
-    
+
     print_warning "Cette opération va remplacer toutes les données existantes!"
     read -p "Êtes-vous sûr? (y/N): " -n 1 -r
     echo
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Restauration depuis $BACKUP_PATH..."
-        
+
         docker cp "$BACKUP_PATH" yupichat-mongodb:/tmp/restore
         docker exec yupichat-mongodb mongorestore --db yupichat --drop /tmp/restore
         docker exec yupichat-mongodb rm -rf /tmp/restore
-        
+
         print_success "Restauration terminée"
     else
         print_status "Restauration annulée"
@@ -158,15 +192,15 @@ reset_mongodb() {
     print_warning "Cette opération va supprimer TOUTES les données YupiChat!"
     read -p "Êtes-vous vraiment sûr? (y/N): " -n 1 -r
     echo
-    
+
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Réinitialisation de MongoDB..."
-        
+
         docker exec yupichat-mongodb mongosh yupichat --eval "db.dropDatabase()"
-        
+
         # Réexécuter le script d'initialisation
         docker exec yupichat-mongodb mongosh yupichat < mongo-init.js
-        
+
         print_success "MongoDB réinitialisé"
     else
         print_status "Réinitialisation annulée"
@@ -176,7 +210,7 @@ reset_mongodb() {
 # Statistiques MongoDB
 stats_mongodb() {
     print_status "Statistiques de la base de données YupiChat:"
-    
+
     docker exec yupichat-mongodb mongosh yupichat --eval "
     print('📊 Statistiques YupiChat');
     print('========================');
@@ -196,9 +230,22 @@ admin_mongodb() {
         print_success "Mongo Express est déjà actif"
     else
         print_status "Démarrage de Mongo Express..."
-        docker-compose --env-file .env.docker --profile development up -d mongo-express
+
+        # Exporter les variables d'environnement
+        export MONGO_PASSWORD="SecureYupiPassword123!"
+        export MONGO_EXPRESS_PASSWORD="AdminYupi123!"
+
+        # Déterminer la commande Docker Compose
+        if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+            COMPOSE_PROFILES=development docker compose up -d mongo-express
+        elif command -v docker-compose &> /dev/null; then
+            COMPOSE_PROFILES=development docker-compose up -d mongo-express
+        else
+            print_error "Docker Compose n'est pas disponible"
+            exit 1
+        fi
     fi
-    
+
     print_status "Mongo Express disponible sur: http://localhost:8081"
     print_status "Identifiants: admin / AdminYupi123!"
 }

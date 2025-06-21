@@ -9,7 +9,7 @@ services:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: yupichat_admin
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-SecurePassword123!}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-SecureYupiPassword123!}
       MONGO_INITDB_DATABASE: yupichat
     volumes:
       - mongodb_data:/data/db
@@ -33,10 +33,10 @@ services:
       - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: yupichat_admin
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-SecurePassword123!}
-      ME_CONFIG_MONGODB_URL: mongodb://yupichat_admin:${MONGO_PASSWORD:-SecurePassword123!}@mongodb:27017/
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD:-SecureYupiPassword123!}
+      ME_CONFIG_MONGODB_URL: mongodb://yupichat_admin:${MONGO_PASSWORD:-SecureYupiPassword123!}@mongodb:27017/
       ME_CONFIG_BASICAUTH_USERNAME: admin
-      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-AdminPass123!}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-AdminYupi123!}
     depends_on:
       - mongodb
     networks:

@@ -80,7 +80,11 @@ check_requirements() {
 setup_mongodb() {
     print_status "Configuration de MongoDB avec Docker..."
 
-    # Créer le fichier .env pour Docker si nécessaire
+    # Exporter les variables d'environnement pour Docker Compose
+    export MONGO_PASSWORD="SecureYupiPassword123!"
+    export MONGO_EXPRESS_PASSWORD="AdminYupi123!"
+
+    # Créer le fichier .env pour Docker si nécessaire (pour référence)
     if [ ! -f ".env.docker" ]; then
         print_status "Création du fichier .env.docker..."
         cat > .env.docker << EOF
@@ -90,26 +94,39 @@ EOF
         print_success "Fichier .env.docker créé"
     fi
 
+    # Vérifier quelle version de docker-compose est disponible
+    if command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker compose"
+    elif command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+    else
+        print_error "Ni 'docker compose' ni 'docker-compose' ne sont disponibles"
+        exit 1
+    fi
+
     # Démarrer MongoDB avec Docker Compose
     if [ "$ENVIRONMENT" = "development" ]; then
         print_status "Démarrage de MongoDB en mode développement (avec Mongo Express)..."
-        docker-compose --env-file .env.docker --profile development up -d mongodb mongo-express
+        COMPOSE_PROFILES=development $DOCKER_COMPOSE_CMD up -d mongodb mongo-express
     else
         print_status "Démarrage de MongoDB en mode production..."
-        docker-compose --env-file .env.docker up -d mongodb
+        $DOCKER_COMPOSE_CMD up -d mongodb
     fi
 
     # Attendre que MongoDB soit prêt
     print_status "Attente du démarrage de MongoDB..."
     for i in {1..30}; do
-        if docker exec yupichat-mongodb mongosh --eval "db.adminCommand('ping')" &> /dev/null; then
+        if docker exec yupichat-mongodb mongosh --eval "db.adminCommand('ping')" &> /dev/null 2>&1; then
             print_success "MongoDB est prêt !"
             break
         fi
         if [ $i -eq 30 ]; then
             print_error "Timeout: MongoDB n'a pas pu démarrer"
+            print_status "Vérification des logs Docker..."
+            docker logs yupichat-mongodb --tail 20
             exit 1
         fi
+        print_status "Tentative $i/30 - Attente de MongoDB..."
         sleep 2
     done
 
