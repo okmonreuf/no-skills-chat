@@ -19,15 +19,15 @@ module.exports = {
         PORT: 80,
         VITE_API_URL: "https://no-skills.fr/api",
       },
-      error_file: "./logs/frontend-error.log",
-      out_file: "./logs/frontend-out.log",
-      log_file: "./logs/frontend-combined.log",
+      error_file: "/var/www/yupichat/logs/frontend-error.log",
+      out_file: "/var/www/yupichat/logs/frontend-out.log",
+      log_file: "/var/www/yupichat/logs/frontend-combined.log",
       time: true,
     },
     {
       name: "yupichat-backend",
-      script: "./dist/server.js",
-      cwd: "./server",
+      script: "./server/dist/server.js",
+      cwd: "/var/www/yupichat",
       instances: 1,
       autorestart: true,
       watch: false,
@@ -78,9 +78,9 @@ module.exports = {
         // Configuration logs pour production
         LOG_LEVEL: "warn",
       },
-      error_file: "./logs/backend-error.log",
-      out_file: "./logs/backend-out.log",
-      log_file: "./logs/backend-combined.log",
+      error_file: "/var/www/yupichat/logs/backend-error.log",
+      out_file: "/var/www/yupichat/logs/backend-out.log",
+      log_file: "/var/www/yupichat/logs/backend-combined.log",
       time: true,
 
       // Configuration de monitoring

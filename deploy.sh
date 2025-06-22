@@ -303,19 +303,28 @@ deploy_production() {
 
     # Arrêter les processus existants
     pm2 stop ecosystem.config.cjs || true
+    pm2 delete ecosystem.config.cjs || true
 
     # Créer les dossiers de production
     sudo mkdir -p /var/www/yupichat
+    sudo mkdir -p /var/www/yupichat/server
+    sudo mkdir -p /var/www/yupichat/server/dist
     sudo mkdir -p /var/www/yupichat/uploads
+    sudo mkdir -p /var/www/yupichat/logs
     sudo mkdir -p /var/log/yupichat
     sudo mkdir -p /etc/nginx/sites-available
     sudo mkdir -p /etc/nginx/sites-enabled
 
-    # Copier les fichiers
+    # Copier les fichiers frontend
     sudo cp -r dist/* /var/www/yupichat/
-    sudo cp -r $BACKEND_DIR/dist /var/www/yupichat/server/
+
+    # Copier les fichiers backend avec la bonne structure
+    sudo cp -r $BACKEND_DIR/dist/* /var/www/yupichat/server/dist/
     sudo cp -r $BACKEND_DIR/node_modules /var/www/yupichat/server/
     sudo cp $BACKEND_DIR/package.json /var/www/yupichat/server/
+    sudo cp $BACKEND_DIR/.env /var/www/yupichat/server/ || true
+
+    # Copier la configuration PM2
     sudo cp ecosystem.config.cjs /var/www/yupichat/
 
     # Copier la configuration Nginx
@@ -326,6 +335,10 @@ deploy_production() {
         sudo ln -sf /etc/nginx/sites-available/no-skills.fr /etc/nginx/sites-enabled/
         sudo nginx -t && sudo systemctl reload nginx || print_warning "Nginx non configuré"
     fi
+
+    # Configurer les permissions
+    sudo chown -R www-data:www-data /var/www/yupichat
+    sudo chmod -R 755 /var/www/yupichat
 
     # Configurer les permissions
     sudo chown -R www-data:www-data /var/www/yupichat
