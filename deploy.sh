@@ -313,7 +313,9 @@ deploy_production() {
 
     # Copier les fichiers
     sudo cp -r dist/* /var/www/yupichat/
-    sudo cp -r $BACKEND_DIR/dist /var/www/yupichat/server
+    sudo cp -r $BACKEND_DIR/dist /var/www/yupichat/server/
+    sudo cp -r $BACKEND_DIR/node_modules /var/www/yupichat/server/
+    sudo cp $BACKEND_DIR/package.json /var/www/yupichat/server/
     sudo cp ecosystem.config.cjs /var/www/yupichat/
 
     # Copier la configuration Nginx

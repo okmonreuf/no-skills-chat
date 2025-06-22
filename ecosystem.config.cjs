@@ -26,7 +26,7 @@ module.exports = {
     },
     {
       name: "yupichat-backend",
-      script: "./server/dist/server.js",
+      script: "./dist/server.js",
       cwd: "./server",
       instances: 1,
       autorestart: true,
