@@ -612,9 +612,7 @@ export default function Privacy() {
                       CNIL (Commission Nationale de l'Informatique et des
                       Libertés)
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      3 Place de Fontenoy - TSA 80715 - 75334 PARIS CEDEX 07
-                    </p>
+                    <div></div>
                     <p className="text-xs">
                       <a
                         href="https://www.cnil.fr/fr/plaintes"

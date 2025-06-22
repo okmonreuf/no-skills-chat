@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import path from "path";
+import bcrypt from "bcryptjs";
 
 import { setupSocketIO } from "./sockets/socket";
 import { setupRoutes } from "./routes";
@@ -162,7 +163,6 @@ const startServer = async () => {
 const createDefaultAdmin = async () => {
   try {
     const { User } = await import("./models/User");
-    const bcrypt = await import("bcryptjs");
 
     const adminExists = await User.findOne({ username: "Yupi" });
 
@@ -171,7 +171,7 @@ const createDefaultAdmin = async () => {
 
       await User.create({
         username: "Yupi",
-        email: "admin@yupichat.com",
+        email: "admin@no-skills.fr",
         password: hashedPassword,
         role: "admin",
         isVerified: true,

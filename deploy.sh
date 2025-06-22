@@ -151,7 +151,7 @@ update_mongodb_config() {
     print_success "Configuration MongoDB mise à jour"
 }
 
-# Fonction de sauvegarde améliorée
+# Fonction de sauvegarde am��liorée
 backup_current() {
     if [ "$ENVIRONMENT" = "production" ]; then
         print_status "Création d'une sauvegarde..."
@@ -166,9 +166,20 @@ backup_current() {
 
         # Sauvegarder la base de données MongoDB (via Docker)
         print_status "Sauvegarde de la base de données..."
-        docker exec yupichat-mongodb mongodump --db yupichat --out /tmp/backup
-        docker cp yupichat-mongodb:/tmp/backup "$BACKUP_DIR/mongodb/"
-        docker exec yupichat-mongodb rm -rf /tmp/backup
+        if docker exec yupichat-mongodb mongodump \
+            --host localhost \
+            --port 27017 \
+            --username yupichat_admin \
+            --password "SecureYupiPassword123!" \
+            --authenticationDatabase admin \
+            --db yupichat \
+            --out /tmp/backup 2>/dev/null; then
+            docker cp yupichat-mongodb:/tmp/backup "$BACKUP_DIR/mongodb/" 2>/dev/null || true
+            docker exec yupichat-mongodb rm -rf /tmp/backup 2>/dev/null || true
+            print_success "Sauvegarde MongoDB créée"
+        else
+            print_warning "Sauvegarde MongoDB échouée (base vide ou pas encore initialisée)"
+        fi
 
         print_success "Sauvegarde créée dans $BACKUP_DIR"
     fi

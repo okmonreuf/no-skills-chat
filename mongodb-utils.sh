@@ -148,7 +148,14 @@ backup_mongodb() {
 
     print_status "Création de la sauvegarde dans $BACKUP_DIR..."
 
-    docker exec yupichat-mongodb mongodump --db yupichat --out /tmp/backup
+    docker exec yupichat-mongodb mongodump \
+        --host localhost \
+        --port 27017 \
+        --username yupichat_admin \
+        --password "SecureYupiPassword123!" \
+        --authenticationDatabase admin \
+        --db yupichat \
+        --out /tmp/backup
     docker cp yupichat-mongodb:/tmp/backup/yupichat "$BACKUP_DIR/"
     docker exec yupichat-mongodb rm -rf /tmp/backup
 
@@ -178,7 +185,14 @@ restore_mongodb() {
         print_status "Restauration depuis $BACKUP_PATH..."
 
         docker cp "$BACKUP_PATH" yupichat-mongodb:/tmp/restore
-        docker exec yupichat-mongodb mongorestore --db yupichat --drop /tmp/restore
+        docker exec yupichat-mongodb mongorestore \
+            --host localhost \
+            --port 27017 \
+            --username yupichat_admin \
+            --password "SecureYupiPassword123!" \
+            --authenticationDatabase admin \
+            --db yupichat \
+            --drop /tmp/restore
         docker exec yupichat-mongodb rm -rf /tmp/restore
 
         print_success "Restauration terminée"
